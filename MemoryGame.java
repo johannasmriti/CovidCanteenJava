@@ -375,7 +375,7 @@ class Memory{
 
 }
 
-class Main  {
+class MemoryGame  {
   public static void main(String[] args) {
     sleep s= new sleep();
     clrscr c=new clrscr();
