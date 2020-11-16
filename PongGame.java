@@ -10,7 +10,7 @@ class GameFrame extends JFrame{
         panel = new GamePanel();
         this.add(panel);
         this.setTitle("Pong Game");
-        //this.setResizable(false);
+        this.setResizable(false);
         this.setBackground(Color.black);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
@@ -21,7 +21,7 @@ class GameFrame extends JFrame{
 
 //Game Panel
 class GamePanel extends JPanel implements Runnable{
-    static final int GAME_WIDTH=800;
+    static final int GAME_WIDTH=1000;
     static final int GAME_HEIGHT=(int)(GAME_WIDTH*(0.5555));
     static final Dimension SCREEN_SIZE= new Dimension(GAME_WIDTH,GAME_HEIGHT);
     static final int BALL_DIAMETER=20;
@@ -35,6 +35,7 @@ class GamePanel extends JPanel implements Runnable{
     Paddle paddle2;
     Ball ball;
     Score score;
+    boolean running= true;
     GamePanel(){
     	newPaddles();
     	newBall();
@@ -61,10 +62,18 @@ class GamePanel extends JPanel implements Runnable{
     	g.drawImage(image,0,0,this);
     }
     public void draw(Graphics g){
-    	paddle1.draw(g);
-    	paddle2.draw(g);
-    	ball.draw(g);
-    	score.draw(g);
+    	if(running==true) {
+    		paddle1.draw(g);
+    		paddle2.draw(g);
+    		ball.draw(g);
+    		score.draw(g);
+    	}
+    	/*else {
+			gameOver(g);
+		}*/
+    	if(score.player1==5 || score.player2==5) {
+    		gameOver(g);
+    	}
     }
     public void move(){
     	paddle1.move();
@@ -133,7 +142,7 @@ class GamePanel extends JPanel implements Runnable{
     	double amountOfTicks = 60.0;
     	double ns = 1000000000/amountOfTicks;
     	double delta = 0;
-    	while(true) {
+    	while(running==true) {
     		long now = System.nanoTime();
     		delta += (now-lastTime)/ns;
     		lastTime=now;
@@ -146,6 +155,27 @@ class GamePanel extends JPanel implements Runnable{
     		}
     	}
     }
+    public void gameOver(Graphics g) {
+		//game score
+		g.setColor(Color.cyan);
+		g.setFont(new Font("INK FREE",Font.BOLD,30));
+		//PRINTS THE PLAYER WHO WON
+		if(score.player1==5) {
+			FontMetrics metrics = getFontMetrics(g.getFont());
+			g.drawString("PLAYER 1 WINS",(GAME_WIDTH - metrics.stringWidth("PLAYER 1 WINS"))/2,GAME_HEIGHT/3);
+		}
+		else {
+			FontMetrics metrics = getFontMetrics(g.getFont());
+			g.drawString("PLAYER 2 WINS",(GAME_WIDTH - metrics.stringWidth("PLAYER 2 WINS"))/2,GAME_HEIGHT/3);
+		}
+		//game over text
+		g.setColor(Color.cyan);
+		g.setFont(new Font("sherif",Font.BOLD,75));
+		//to allign the game over text to center
+		FontMetrics met= getFontMetrics(g.getFont());
+		g.drawString("GAME OVER",(GAME_WIDTH - met.stringWidth("GAME OVER"))/2,GAME_HEIGHT/2);
+		running=false;
+	}
     public class AL extends KeyAdapter{
         public void keyPressed(KeyEvent e){
         	paddle1.keyPressed(e);
@@ -263,12 +293,13 @@ class Ball extends Rectangle{
     	y+=yVelocity;
     }
     public void draw(Graphics g){
+    	//g.setColor(new Color(random.nextInt(255),random.nextInt(255),random.nextInt(255)));
     	g.setColor(Color.white);
     	g.fillOval(x,y,height,width);
     }
 }
 
-//Score Generator
+//Score
 class Score extends Rectangle{
     static int GAME_WIDTH;
     static int GAME_HEIGHT;
@@ -288,8 +319,9 @@ class Score extends Rectangle{
     }
 }
 
-//Main Class
-public class PongGame {
+
+//Main classpublic 
+class PongGame {
     public static void main(String args[]){
         GameFrame frame = new GameFrame();
     }
